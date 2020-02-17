@@ -1,10 +1,7 @@
 FROM debian:buster
-RUN apt-get update -y && apt-get upgrade -y
-RUN apt-get install -y nginx mariadb-server php7.3-common php7.3-cli php7.3-fpm
-RUN /etc/init.d/mysql start && \
-        mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE wpdatabase" && echo "1" && \
-        mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER 'wpuser' IDENTIFIED BY 'wppassword'"  && echo "2" && \
-        mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT USAGE ON *.* TO 'wpuser'@localhost IDENTIFIED BY 'wppassword'"  && echo "3" && \
-        mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL privileges ON wpdatabase.* TO 'wpuser'@localhost"
-ENTRYPOINT service mysql start && nginx -g'daemon off;'
+RUN apt-get update -qq -y && apt-get upgrade -qq -y
+RUN apt-get install -qq -y nginx mariadb-server php7.3-common php7.3-cli php7.3-fpm php7.3-json php7.3-mysql php7.3-mbstring wget vim
+COPY srcs/default srcs/LEMP.sh srcs/www.conf srcs/config.inc.php srcs/wp-config.php ./
+RUN sh LEMP.sh
+#ENTRYPOINT service mysql start && service php7.3-fpm start && nginx -g'daemon off;'
 EXPOSE 80
