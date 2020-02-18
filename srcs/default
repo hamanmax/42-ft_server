@@ -25,7 +25,7 @@ server {
       include /etc/nginx/fastcgi_params;
       fastcgi_pass 127.0.0.1:9000;
       fastcgi_index index.php;
-      fastcgi_param SCRIPT_FILENAME /usr/share/phpmyadmin$fastcgi_script_name;
+      fastcgi_param SCRIPT_FILENAME /var/www/wordpress$fastcgi_script_name;
    }
    location /wordpress {
    	alias /var/www/wordpress;
