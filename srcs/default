@@ -1,11 +1,17 @@
 server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-        root /usr/share/phpmyadmin;
-        location / {
-                index index.php;
-        }
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    return 301 https://localhost$request_uri;
+}
 
+server {
+
+    # SSL configuration
+
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+    include snippets/self-signed.conf;
+    include snippets/ssl-params.conf;
 ## Images and static content is treated different
         location ~* ^.+.(jpg|jpeg|gif|css|png|js|ico|xml)$ {
                 access_log off;
@@ -28,7 +34,7 @@ server {
       fastcgi_param SCRIPT_FILENAME /var/www/wordpress$fastcgi_script_name;
    }
    location /wordpress {
-   	alias /var/www/wordpress;
-	index index.php;
+        alias /var/www/wordpress;
+        index index.php;
    }
 }

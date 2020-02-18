@@ -23,3 +23,6 @@ wget -q https://wordpress.org/latest.tar.gz
 tar -xzf latest.tar.gz && rm latest.tar.gz
 mv wp-config.php wordpress/
 mv wordpress /var/www/
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt  -subj "/C=FR/ST=AURA/L=Lyon/O=42Lyon/CN="
+mv self-signed.conf /etc/nginx/snippets/self-signed.conf && mv ssl-params.conf /etc/nginx/snippets/ssl-params.conf
+echo "opensslencrypt" && openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
