@@ -1,40 +1,45 @@
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    return 301 https://localhost$request_uri;
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	return 301 https://localhost$request_uri;
 }
 
 server {
 
-    # SSL configuration
+	# SSL configuration
 
-    listen 443 ssl http2 default_server;
-    listen [::]:443 ssl http2 default_server;
-    include snippets/self-signed.conf;
-    include snippets/ssl-params.conf;
+	listen 443 ssl http2 default_server;
+	listen [::]:443 ssl http2 default_server;
+	include snippets/self-signed.conf;
+	include snippets/ssl-params.conf;
+		root /var/www/;
+		autoindex ${AUTOINDEX};
+		error_page 403 /wordpress;
 ## Images and static content is treated different
-        location ~* ^.+.(jpg|jpeg|gif|css|png|js|ico|xml)$ {
-                access_log off;
-                expires 30d;
-        }
+	location ^~ /wordpress {
+		alias   /var/www/wordpress;
+		index index.php;
+		location ~* ^.+.(jpg|jpeg|gif|css|png|js|ico|xml)$ {
+			access_log off;
+			expires 30d;
+		}
 
-   location ~ /\.ht {
-      deny all;
-   }
+		location ~ \.php$ {
+		include        fastcgi_params;
+		fastcgi_pass    127.0.0.1:9000;
+		fastcgi_index   index.php;
+		fastcgi_param   SCRIPT_FILENAME $request_filename;
+		}
+	}
 
-   location ~ /(libraries|setup/frames|setup/libs) {
-      deny all;
-      return 404;
-   }
-
-   location ~ \.php$ {
-      include /etc/nginx/fastcgi_params;
-      fastcgi_pass 127.0.0.1:9000;
-      fastcgi_index index.php;
-      fastcgi_param SCRIPT_FILENAME /var/www/wordpress$fastcgi_script_name;
-   }
-   location /wordpress {
-        alias /var/www/wordpress;
-        index index.php;
-   }
+	location ^~ /phpmyadmin {
+		alias   /usr/share/phpmyadmin;
+		index index.php;
+		location ~ \.php$ {
+			fastcgi_pass   127.0.0.1:9000;
+			include        fastcgi_params;
+			fastcgi_index  index.php;
+			fastcgi_param  SCRIPT_FILENAME $request_filename;
+		}
+	}
 }
